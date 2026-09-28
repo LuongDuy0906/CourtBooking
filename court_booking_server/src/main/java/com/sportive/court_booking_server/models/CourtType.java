@@ -1,11 +1,13 @@
 package com.sportive.court_booking_server.models;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import com.sportive.court_booking_server.common.enums.CourtStatus;
+import com.sportive.court_booking_server.common.enums.SportType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,35 +17,32 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
-@Entity 
+@Entity
 @AllArgsConstructor 
 @NoArgsConstructor 
-@Table(name = "courts")
-public class Court {
-    @Id
+@Table(name = "court_types")
+public class CourtType {
+    @Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false)
-    private String name;
-
-    @Column(name = "status", nullable = false)
+    @Column(name = "sport_type", nullable = false)
     @Enumerated(EnumType.STRING)
-    private CourtStatus courtStatus = CourtStatus.ACTIVE;
+    private SportType code;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "court_type_id", referencedColumnName = "id", nullable = false)
-    private CourtType courtType;
+    @OneToMany(mappedBy = "courtType", fetch = FetchType.LAZY)
+    private List<Court> courts = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "facility_id", referencedColumnName = "id", nullable = false)
-    private Facility facility;
+    @Column(name = "slot_duration_minutes", nullable = false)
+    private Integer slotDurationMinute = 30;
+
+    @OneToMany(mappedBy = "courtType", fetch = FetchType.LAZY)
+    private List<PricingRule> pricingRules = new ArrayList<>();
 
     @CreationTimestamp()
     @Column(name = "created_at", updatable = false)
@@ -61,36 +60,28 @@ public class Court {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public SportType getCode() {
+        return code;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setCode(SportType code) {
+        this.code = code;
     }
 
-    public CourtStatus getCourtStatus() {
-        return courtStatus;
+    public List<Court> getCourts() {
+        return courts;
     }
 
-    public void setCourtStatus(CourtStatus courtStatus) {
-        this.courtStatus = courtStatus;
+    public void setCourts(List<Court> courts) {
+        this.courts = courts;
     }
 
-    public CourtType getCourtType() {
-        return courtType;
+    public Integer getSlotDurationMinute() {
+        return slotDurationMinute;
     }
 
-    public void setCourtType(CourtType courtType) {
-        this.courtType = courtType;
-    }
-
-    public Facility getFacility() {
-        return facility;
-    }
-
-    public void setFacility(Facility facility) {
-        this.facility = facility;
+    public void setSlotDurationMinute(Integer slotDurationMinute) {
+        this.slotDurationMinute = slotDurationMinute;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -107,5 +98,13 @@ public class Court {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public List<PricingRule> getPricingRules() {
+        return pricingRules;
+    }
+
+    public void setPricingRules(List<PricingRule> pricingRules) {
+        this.pricingRules = pricingRules;
     }
 }

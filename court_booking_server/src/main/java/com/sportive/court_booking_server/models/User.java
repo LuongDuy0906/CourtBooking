@@ -1,7 +1,9 @@
 package com.sportive.court_booking_server.models;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -21,6 +23,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -60,6 +63,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private Set<UserRole> roles = new HashSet<>();
+
+    @OneToMany(mappedBy = "manager", fetch = FetchType.LAZY)
+    private List<Facility> facilities = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -119,6 +125,14 @@ public class User {
 
     public void addRole(UserRole role) {
         this.roles.add(role);
+    }
+
+    public List<Facility> getFacilities() {
+        return facilities;
+    }
+
+    public void setFacilities(List<Facility> facilities) {
+        this.facilities = facilities;
     }
 }
 

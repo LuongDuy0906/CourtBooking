@@ -1,9 +1,10 @@
 package com.sportive.court_booking_server.models;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -17,6 +18,9 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -25,7 +29,13 @@ import lombok.NoArgsConstructor;
 @Entity 
 @AllArgsConstructor 
 @NoArgsConstructor 
-@Table(name = "facilities")
+@Table(
+    name = "facilities", 
+    indexes = {
+        @Index(name = "idx_facility_location", columnList = "city, ward"),
+        @Index(name = "idx_facility_manager", columnList = "manager_id")
+    }
+)
 public class Facility {
     @Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,6 +56,12 @@ public class Facility {
     @Column(name = "contact")
     private String contact;
 
+    @Column(name = "latitude", precision = 10, scale = 7)
+    private BigDecimal latitude;
+
+    @Column(name = "longitude", precision = 10, scale = 7)
+    private BigDecimal longitude;
+
     @Column(name = "open_time", nullable = false)
     @JsonFormat(pattern = "HH:mm")
     private LocalTime openTime;
@@ -55,7 +71,14 @@ public class Facility {
     private LocalTime closeTime;
 
     @OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private Set<PricingRule> pricingRules = new HashSet<>();
+    private List<PricingRule> pricingRules = new ArrayList<>();
+
+    @OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Court> courts = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "manager_id", referencedColumnName = "id", nullable = false)
+    private User manager;
 
     @CreationTimestamp()
     @Column(name = "created_at", updatable = false)
@@ -135,5 +158,53 @@ public class Facility {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getDetailAddress() {
+        return detailAddress;
+    }
+
+    public void setDetailAddress(String detailAddress) {
+        this.detailAddress = detailAddress;
+    }
+
+    public List<PricingRule> getPricingRules() {
+        return pricingRules;
+    }
+
+    public void setPricingRules(List<PricingRule> pricingRules) {
+        this.pricingRules = pricingRules;
+    }
+
+    public List<Court> getCourts() {
+        return courts;
+    }
+
+    public void setCourts(List<Court> courts) {
+        this.courts = courts;
+    }
+
+    public BigDecimal getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(BigDecimal latitude) {
+        this.latitude = latitude;
+    }
+
+    public BigDecimal getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(BigDecimal longitude) {
+        this.longitude = longitude;
+    }
+
+    public User getManager() {
+        return manager;
+    }
+
+    public void setManager(User manager) {
+        this.manager = manager;
     }
 }

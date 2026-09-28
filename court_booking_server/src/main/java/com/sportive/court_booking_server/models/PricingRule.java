@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.ManyToAny;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import com.sportive.court_booking_server.common.enums.DayType;
@@ -43,11 +42,15 @@ public class PricingRule {
 
     @Column(name = "day_type", nullable = false)
     @Enumerated(EnumType.STRING)
-    private DayType datType;
+    private DayType dayType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "facility_id", referencedColumnName = "id", nullable = false)
     private Facility facility;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "court_type_id", referencedColumnName = "id", nullable = false)
+    private CourtType courtType;
 
     @CreationTimestamp()
     @Column(name = "created_at", updatable = false)
@@ -89,12 +92,12 @@ public class PricingRule {
         this.pricePerSlot = pricePerSlot;
     }
 
-    public DayType getDatType() {
-        return datType;
+    public DayType getDayType() {
+        return dayType;
     }
 
-    public void setDatType(DayType datType) {
-        this.datType = datType;
+    public void setDayType(DayType dayType) {
+        this.dayType = dayType;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -113,5 +116,19 @@ public class PricingRule {
         this.updatedAt = updatedAt;
     }
 
-    
+    public Facility getFacility() {
+        return facility;
+    }
+
+    public void setFacility(Facility facility) {
+        this.facility = facility;
+    }
+
+    public CourtType getCourtType() {
+        return courtType;
+    }
+
+    public void setCourtType(CourtType courtType) {
+        this.courtType = courtType;
+    }
 }
