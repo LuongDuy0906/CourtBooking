@@ -8,6 +8,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import com.sportive.court_booking_server.common.enums.DayType;
 
+import jakarta.persistence.CheckConstraint;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -16,16 +17,35 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
-@Entity 
-@AllArgsConstructor 
-@NoArgsConstructor 
-@Table(name = "pricing_rules")
+@Entity
+@NoArgsConstructor
+@Table(
+    name = "pricing_rules",
+    check = {
+        @CheckConstraint(
+            name = "chk_pricing_rule_time",
+            constraint = "start_time < end_time"
+        ),
+        @CheckConstraint(
+            name = "chk_pricing_rule_price",
+            constraint = "price_per_slot >= 0"
+        ),
+        @CheckConstraint(
+            name = "chk_pricing_rule_slot_duration",
+            constraint = "slot_duration_minutes > 0"
+        )
+    },
+    indexes = @Index(
+        name = "idx_pricing_rule_lookup",
+        columnList = "facility_id, court_type_id, day_type, start_time, end_time"
+    )
+)
 public class PricingRule {
     @Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,15 +60,18 @@ public class PricingRule {
     @Column(name = "price_per_slot", nullable = false)
     private Long pricePerSlot;
 
+    @Column(name = "slot_duration_minutes", nullable = false)
+    private Integer slotDurationMinutes = 30;
+
     @Column(name = "day_type", nullable = false)
     @Enumerated(EnumType.STRING)
     private DayType dayType;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "facility_id", referencedColumnName = "id", nullable = false)
     private Facility facility;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "court_type_id", referencedColumnName = "id", nullable = false)
     private CourtType courtType;
 
@@ -90,6 +113,14 @@ public class PricingRule {
 
     public void setPricePerSlot(Long pricePerSlot) {
         this.pricePerSlot = pricePerSlot;
+    }
+
+    public Integer getSlotDurationMinutes() {
+        return slotDurationMinutes;
+    }
+
+    public void setSlotDurationMinutes(Integer slotDurationMinutes) {
+        this.slotDurationMinutes = slotDurationMinutes;
     }
 
     public DayType getDayType() {

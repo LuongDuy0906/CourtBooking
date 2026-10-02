@@ -2,7 +2,7 @@ package com.sportive.court_booking_server.common.enums;
 
 public enum SportType {
     BADMINTON("Cầu lông"),
-    PICKLEBALL("Pickelball"),
+    PICKLEBALL("Pickleball"),
     TENNIS("Tennis"),
     FOOTBALL_7("Bóng đá sân 7"),
     FOOTBALL_9("Bóng đá sân 9"),

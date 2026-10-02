@@ -19,27 +19,22 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 @Entity
-@AllArgsConstructor 
-@NoArgsConstructor 
+@NoArgsConstructor
 @Table(name = "court_types")
 public class CourtType {
     @Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "sport_type", nullable = false)
+    @Column(name = "sport_type", nullable = false, unique = true)
     @Enumerated(EnumType.STRING)
     private SportType code;
 
     @OneToMany(mappedBy = "courtType", fetch = FetchType.LAZY)
     private List<Court> courts = new ArrayList<>();
-
-    @Column(name = "slot_duration_minutes", nullable = false)
-    private Integer slotDurationMinute = 30;
 
     @OneToMany(mappedBy = "courtType", fetch = FetchType.LAZY)
     private List<PricingRule> pricingRules = new ArrayList<>();
@@ -74,14 +69,6 @@ public class CourtType {
 
     public void setCourts(List<Court> courts) {
         this.courts = courts;
-    }
-
-    public Integer getSlotDurationMinute() {
-        return slotDurationMinute;
-    }
-
-    public void setSlotDurationMinute(Integer slotDurationMinute) {
-        this.slotDurationMinute = slotDurationMinute;
     }
 
     public LocalDateTime getCreatedAt() {

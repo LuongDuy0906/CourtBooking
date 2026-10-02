@@ -23,12 +23,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
-@Entity 
-@AllArgsConstructor 
-@NoArgsConstructor 
+@Entity
+@NoArgsConstructor
 @Table(
     name = "facilities", 
     indexes = {
@@ -41,19 +39,19 @@ public class Facility {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, length = 150)
     private String name;
 
-    @Column(name = "city")
+    @Column(name = "city", length = 100)
     private String city;
 
-    @Column(name = "ward")
+    @Column(name = "ward", length = 100)
     private String ward;
 
-    @Column(name = "detail_address")
+    @Column(name = "detail_address", length = 255)
     private String detailAddress;
 
-    @Column(name = "contact")
+    @Column(name = "contact", length = 20)
     private String contact;
 
     @Column(name = "latitude", precision = 10, scale = 7)
@@ -76,9 +74,12 @@ public class Facility {
     @OneToMany(mappedBy = "facility", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Court> courts = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "manager_id", referencedColumnName = "id", nullable = false)
     private User manager;
+
+    @OneToMany(mappedBy = "facility", fetch = FetchType.LAZY)
+    private List<Booking> bookings = new ArrayList<>();
 
     @CreationTimestamp()
     @Column(name = "created_at", updatable = false)
@@ -206,5 +207,13 @@ public class Facility {
 
     public void setManager(User manager) {
         this.manager = manager;
+    }
+
+    public List<Booking> getBookings() {
+        return bookings;
+    }
+
+    public void setBookings(List<Booking> bookings) {
+        this.bookings = bookings;
     }
 }

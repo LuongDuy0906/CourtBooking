@@ -26,22 +26,21 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
+import jakarta.persistence.UniqueConstraint;
 import lombok.NoArgsConstructor;
 
-@Entity 
-@AllArgsConstructor 
-@NoArgsConstructor 
+@Entity
+@NoArgsConstructor
 @Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(name = "email", nullable = false, unique = true)
+    @Column(name = "email", nullable = false, unique = true, length = 150)
     private String email;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password", nullable = false, length = 100)
     private String password;
 
     @Column(name = "created_at", updatable = false)
@@ -58,7 +57,11 @@ public class User {
     @ElementCollection(targetClass = UserRole.class, fetch = FetchType.EAGER)
     @CollectionTable(
         name = "user_role",
-        joinColumns = @JoinColumn(name = "user_id")
+        joinColumns = @JoinColumn(name = "user_id"),
+        uniqueConstraints = @UniqueConstraint(
+            name = "uk_user_role",
+            columnNames = {"user_id", "role"}
+        )
     )
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
@@ -66,6 +69,9 @@ public class User {
 
     @OneToMany(mappedBy = "manager", fetch = FetchType.LAZY)
     private List<Facility> facilities = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Booking> bookings = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -133,6 +139,14 @@ public class User {
 
     public void setFacilities(List<Facility> facilities) {
         this.facilities = facilities;
+    }
+
+    public List<Booking> getBookings() {
+        return bookings;
+    }
+
+    public void setBookings(List<Booking> bookings) {
+        this.bookings = bookings;
     }
 }
 

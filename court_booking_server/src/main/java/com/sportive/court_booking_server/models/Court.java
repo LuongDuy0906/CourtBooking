@@ -15,33 +15,37 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
+import jakarta.persistence.UniqueConstraint;
 import lombok.NoArgsConstructor;
 
-@Entity 
-@AllArgsConstructor 
-@NoArgsConstructor 
-@Table(name = "courts")
+@Entity
+@NoArgsConstructor
+@Table(
+    name = "courts",
+    uniqueConstraints = { @UniqueConstraint(name = "uk_court_facility_name", columnNames = {"facility_id", "name"}) },
+    indexes = { @Index(name = "idx_court_facility_status", columnList = "facility_id, status") }
+)
 public class Court {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, length = 100)
     private String name;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private CourtStatus courtStatus = CourtStatus.ACTIVE;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "court_type_id", referencedColumnName = "id", nullable = false)
     private CourtType courtType;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "facility_id", referencedColumnName = "id", nullable = false)
     private Facility facility;
 
